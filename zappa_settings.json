@@ -1,0 +1,10 @@
+{
+    "production": {
+        "aws_region": "us-west-1",
+        "django_settings": "inbot.settings",
+        "project_name": "instagram-follower-bot",
+        "runtime": "python3.6",
+        "s3_bucket": "instabot.skrollo.com",
+        "apigateway_description": "Instagram bot follower"
+    }
+}
