@@ -14,12 +14,14 @@ import os
 import django
 from django.core.mail import send_mail
 
-sys.path.append('..\\')
+sys.path.append('..//')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'inbot.settings'
+# print(os.environ.get('DJANGO_SETTINGS_MODULE'))
 django.setup()
 
 from webmaster.models import SettingsModel, TargetModel
 # from inbot import settings
+from scrapeTargets import scrapeTarget
 
 def MasterSettings():
     settings = get_settings()
@@ -51,21 +53,22 @@ def getInsta():
             driver.quit()
         except:
             pass
-        prox = Proxy()
-        prox.proxy_type = ProxyType.MANUAL
-        http_proxy = "65.184.156.234:52981"
+        # prox = Proxy()
+        # prox.proxy_type = ProxyType.MANUAL
+        # http_proxy = "65.184.156.234:52981"
         
-        capabilities = webdriver.DesiredCapabilities.CHROME
-        prox.add_to_capabilities(capabilities)
+        # capabilities = webdriver.DesiredCapabilities.CHROME
+        # prox.add_to_capabilities(capabilities)
         options = Options()
-        options.headless = True
+        # options.headless = True
         # options = webdriver.ChromeOptions()
         # options.add_argument('--proxy-server=%s' % http_proxy)
         
-        driver = webdriver.Chrome('./chromedriver.exe',  options=options)
+        driver = webdriver.Chrome('./chromedriver',  options=options)
         # driver.get("http://whatismyipaddress.com")
         driver.get('https://www.instagram.com/accounts/login/')
         driver.save_screenshot('./images/getInsta.png')
+        driver.minimize_window()
         return driver
     except Exception as e:
         print(e)
@@ -171,6 +174,10 @@ def mainPage(driver):
 def profilePage(driver):
     # #print'profilePage')
     time.sleep(5)
+
+    driver.get('https://www.instagram.com/strawberries_black/')
+
+
     try:
         divs = driver.find_elements_by_tag_name('div')
         for div in divs:
@@ -329,6 +336,7 @@ def follow(driver, frequencyfollow):
         except Exception as e:
             print(e)
             driver.save_screenshot('./images/follow_Error.png')
+            doneFollow(target[0].link)
             return None
             
     return None
@@ -379,8 +387,9 @@ def unfollow(driver, daysAfterUnfollow):
                         break
                 driver.save_screenshot('./images/unfollowSuccess.png')
                 return driver
-            except:
+            except Exception as e:
                 print(e)
+                doneUnFollow(target[0].link)
                 driver.save_screenshot('./images/unfollow_Error.png')
                 return None
     return None
@@ -456,7 +465,7 @@ def sendMailToUser(emailId):
     print('In mail')
     subject = 'Suspicion Page found in Inbot'
     msg = 'Hi I am Inbot, I have encountered a SUSPICION PAGE or The Code entered was Not the latest One, Please Help me out of this by providing the Code in my Settings Page.'
-    fromEmail = 'skrolloinstasender@gmail.com'
+    fromEmail = 'sharmashourya80@gmail.com'
     res = send_mail(subject, msg, fromEmail, [emailId], fail_silently= False)
     print('mail Sent')
     print(res)
@@ -527,6 +536,12 @@ def suspicionBrain(driver, emailsuspicion):
         print(e)
         return None
 
+def checkTarget(link):
+    try:
+        return TargetModel.objects.get(link=link)
+    except TargetModel.DoesNotExist:
+        return None    
+
 def brain():
     settings = MasterSettings()
     if settings and settings['state'] is True:
@@ -534,7 +549,7 @@ def brain():
         time.sleep(random.randint(5,10))
         loggedInDriver = login(driver, settings['username'], settings['password'])
         if loggedInDriver:
-            time.sleep((random.randint(4,8))
+            time.sleep(random.randint(4,8))
             # print('above')
             clearSuspicionDriver = suspicionBrain(loggedInDriver, settings['emailsuspicion'])
             # print('below')
@@ -544,6 +559,22 @@ def brain():
                 #print299)
                 if mainPageDriver:
                     time.sleep(5)
+                    """ -------------- --------------------------"""
+                    scraper = False
+                    if scraper == True: 
+                        url = 'https://www.instagram.com/upmasharmaofficial/'
+                        nis, driver = scrapeTarget(mainPageDriver, url)
+                        print(len(nis))
+                        for person in nis[25:]:#start from people href instead of trash pages
+                            print('under person')
+                            a_tag = person.find_element_by_tag_name('a').get_attribute('href')
+                            check = checkTarget(a_tag)
+                            if check:
+                                pass
+                            else:
+                                fillTarget(a_tag)
+                        profilePageDriver = profilePage(driver)
+                    """ -------------------- ---------------------"""
                     profilePageDriver = profilePage(mainPageDriver)
                     #print302)
                     if profilePageDriver:
