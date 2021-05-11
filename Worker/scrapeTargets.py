@@ -39,7 +39,7 @@ def scrapeTarget(driver, url):
             newlist = len(nis)
             counter+=1000
             check+=1
-            if check >= 5:
+            if check >= 1000:
                 break
         return (nis, driver)
     except:

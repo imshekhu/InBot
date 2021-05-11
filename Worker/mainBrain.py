@@ -176,7 +176,7 @@ def profilePage(driver):
     time.sleep(5)
 
     driver.get('https://www.instagram.com/strawberries_black/')
-
+    driver.minimize_window()
 
     try:
         divs = driver.find_elements_by_tag_name('div')
@@ -308,6 +308,7 @@ def follow(driver, frequencyfollow):
     # #printtarget)
     if target:
         driver.get(target[0].link)
+        driver.minimize_window()
         time.sleep(5)
         try:
             followSt = False
@@ -353,6 +354,7 @@ def unfollow(driver, daysAfterUnfollow):
 
     if target:
         driver.get(target[0].link)
+        driver.minimize_window()
         time.sleep(5)
 
         try:
@@ -370,6 +372,7 @@ def unfollow(driver, daysAfterUnfollow):
                     break
             driver.save_screenshot('./images/unfollowSuccess.png')
             doneUnFollow(target[0].link)
+            time.sleep(3)
             return driver
         except :
             try:
@@ -561,20 +564,25 @@ def brain():
                     time.sleep(5)
                     """ -------------- --------------------------"""
                     scraper = False
+                    # scraper = True
+                    
                     if scraper == True: 
-                        url = 'https://www.instagram.com/upmasharmaofficial/'
+                        url = 'https://www.instagram.com/nayantharaaa/'
                         nis, driver = scrapeTarget(mainPageDriver, url)
-                        print(len(nis))
+                        # print(len(nis))
                         for person in nis[25:]:#start from people href instead of trash pages
-                            print('under person')
-                            a_tag = person.find_element_by_tag_name('a').get_attribute('href')
-                            check = checkTarget(a_tag)
-                            if check:
+                            # print('under person')
+                            try:
+                                a_tag = person.find_element_by_tag_name('a').get_attribute('href')
+                                check = checkTarget(a_tag)
+                                if check:
+                                    pass
+                                else:
+                                    fillTarget(a_tag)
+                            except:
                                 pass
-                            else:
-                                fillTarget(a_tag)
                         profilePageDriver = profilePage(driver)
-                    """ -------------------- ---------------------"""
+                    """ -------------------- --------------------- """
                     profilePageDriver = profilePage(mainPageDriver)
                     #print302)
                     if profilePageDriver:
