@@ -64,11 +64,11 @@ def getInsta():
         # options = webdriver.ChromeOptions()
         # options.add_argument('--proxy-server=%s' % http_proxy)
         
-        driver = webdriver.Chrome('./chromedriver',  options=options)
+        driver = webdriver.Chrome('./chromedriver.exe',  options=options)
         # driver.get("http://whatismyipaddress.com")
         driver.get('https://www.instagram.com/accounts/login/')
         driver.save_screenshot('./images/getInsta.png')
-        driver.minimize_window()
+        # driver.minimize_window()
         return driver
     except Exception as e:
         print(e)
